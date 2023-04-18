@@ -1,21 +1,26 @@
+import configparser
 import boto3
 import psycopg2
 import logging
 
-# Define AWS credentials
-aws_access_key_id = 'YOUR_ACCESS_KEY_ID'
-aws_secret_access_key = 'YOUR_SECRET_ACCESS_KEY'
+# Read configuration file
+config = configparser.ConfigParser()
+config.read('config.ini')
 
-# Define Redshift credentials
-redshift_endpoint = 'YOUR_REDSHIFT_ENDPOINT'
-redshift_user = 'YOUR_REDSHIFT_USER'
-redshift_password = 'YOUR_REDSHIFT_PASSWORD'
-redshift_port = '5439'
-redshift_database = 'YOUR_REDSHIFT_DATABASE'
+# Get AWS credentials from configuration file
+aws_access_key_id = config['AWS']['access_key_id']
+aws_secret_access_key = config['AWS']['secret_access_key']
 
-# Define S3 bucket and file path
-s3_bucket = 'YOUR_S3_BUCKET'
-s3_file_path = 'YOUR_S3_FILE_PATH'
+# Get Redshift credentials from configuration file
+redshift_endpoint = config['Redshift']['endpoint']
+redshift_user = config['Redshift']['user']
+redshift_password = config['Redshift']['password']
+redshift_port = config['Redshift']['port']
+redshift_database = config['Redshift']['database']
+
+# Get S3 bucket and file path from configuration file
+s3_bucket = config['S3']['bucket']
+s3_file_path = config['S3']['file_path']
 
 # Set up logging
 logging.basicConfig(filename='redshift_load.log', level=logging.INFO)
@@ -40,8 +45,8 @@ try:
 
     # Get table information from AWS Glue catalog
     table_info = glue_conn.get_table(
-        DatabaseName='YOUR_DATABASE_NAME',
-        Name='YOUR_TABLE_NAME'
+        DatabaseName=config['AWS Glue']['database_name'],
+        Name=config['AWS Glue']['table_name']
     )
 
     # Create Redshift table schema
@@ -60,7 +65,7 @@ try:
     redshift_schema = redshift_schema[:-2]
 
     # Define Redshift table name
-    redshift_table = 'YOUR_REDSHIFT_TABLE_NAME'
+    redshift_table = config['AWS Glue']['table_name']
 
     # Check if the table exists and drop it if it does
     with redshift_conn.cursor() as cursor:
