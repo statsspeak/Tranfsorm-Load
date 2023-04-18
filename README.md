@@ -1,19 +1,35 @@
-### Python Script for Loading CSV Data from S3 Bucket to Redshift Table
+# Redshift data loading script
 
-This code is a Python script that loads data from a CSV file in an S3 bucket into a Redshift database table. It does the following:
+This Python script reads configuration values from a `config.ini` file and uses those values to load data from an S3 bucket into a Redshift table. The script uses the following libraries:
 
-1. Import the necessary Python libraries - `boto3`, `psycopg2`, and `logging`.
-2. Set up AWS and Redshift credentials, S3 bucket and file path, and logging file name.
-3. Create a connection to the Redshift database using `psycopg2`.
-4. Create a connection to AWS Glue using `boto3`.
-5. Retrieve information about the table being loaded from AWS Glue catalog using `get_table()` method.
-6. Map data types from the table retrieved from AWS Glue to appropriate PostgreSQL data types.
-7. Create a schema for the Redshift table by iterating over columns of the table retrieved from AWS Glue and mapping data types to appropriate PostgreSQL data types.
-8. Check if the table exists in the Redshift database and drop it if it does.
-9. Create a new table in the Redshift database using `CREATE TABLE` command with the schema defined in step 7.
-10. Load data from the CSV file in the S3 bucket into the Redshift table using `COPY` command with the parameters provided.
-11. Log successful or error messages during the execution.
-12. Close connections to Redshift and Glue.
+- `configparser` for reading the configuration file
+- `boto3` for interacting with AWS services
+- `psycopg2` for connecting to and interacting with a Redshift database
+- `logging` for logging status messages to a file
 
-**Note:** You should replace the placeholders with your own AWS and Redshift credentials, S3 bucket and file path, database and table name.
+## Configuration
 
+The script reads the following values from the `config.ini` file:
+
+- AWS access key ID and secret access key for authentication
+- Redshift database endpoint, username, password, port, and database name
+- S3 bucket name and file path for the input data file
+- AWS Glue catalog database name and table name for the input data schema
+
+## Data loading process
+
+The script performs the following steps:
+
+1. Reads configuration values from `config.ini`
+2. Creates a connection to Redshift and AWS Glue using the configuration values
+3. Retrieves schema information for the input data from the AWS Glue catalog
+4. Creates a Redshift table with the same schema as the input data
+5. Loads the input data from S3 into the Redshift table using the COPY command
+6. Logs the success or failure of the data loading process
+
+## Usage
+
+1. Create a `config.ini` file with the required configuration values
+2. Run the `redshift_load.py` script
+
+Note: Before running the script, make sure that the Redshift cluster and S3 bucket are properly configured and accessible.
